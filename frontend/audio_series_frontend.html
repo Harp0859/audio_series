@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Series - Premium Audio Stories</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .coin-display {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f56565, #e53e3e);
+            color: white;
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Landing Page */
+        .hero {
+            text-align: center;
+            padding: 4rem 0;
+            color: white;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Series Grid */
+        .series-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .series-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .series-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+        }
+
+        .series-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .series-content {
+            padding: 1.5rem;
+        }
+
+        .series-title {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .series-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .premium-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 0.25rem 0.75rem;
+            border-radius: 25px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Episode List */
+        .episode-list {
+            margin-top: 2rem;
+        }
+
+        .episode-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .episode-item:hover {
+            transform: translateX(8px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .episode-info {
+            flex: 1;
+        }
+
+        .episode-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .episode-duration {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .episode-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .coin-price {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Forms */
+        .form-container {
+            max-width: 400px;
+            margin: 2rem auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Audio Player */
+        .audio-player {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .player-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+
+        /* Coin Bundles */
+        .bundles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .bundle-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .bundle-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+        }
+
+        .bundle-coins {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .bundle-price {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 1rem;
+            }
+
+            .nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                gap: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .main {
+                padding: 1rem;
+            }
+
+            .series-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .episode-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .episode-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.6s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-in {
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, createContext, useContext } = React;
+
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:8081/api/v1';
+
+        // Auth Context
+        const AuthContext = createContext();
+
+        const useAuth = () => {
+            const context = useContext(AuthContext);
+            if (!context) {
+                throw new Error('useAuth must be used within an AuthProvider');
+            }
+            return context;
+        };
+
+        // API Service
+        const api = {
+            async request(endpoint, options = {}) {
+                const token = localStorage.getItem('token');
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { Authorization: `Bearer ${token}` }),
+                    },
+                    ...options,
+                };
+
+                if (config.body && typeof config.body === 'object') {
+                    config.body = JSON.stringify(config.body);
+                }
+
+                try {
+                    const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || 'Request failed');
+                    }
+                    
+                    return data;
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            },
+
+            // Auth endpoints
+            auth: {
+                login: (credentials) => api.request('/auth/login', {
+                    method: 'POST',
+                    body: credentials,
+                }),
+                register: (userData) => api.request('/auth/register', {
+                    method: 'POST',
+                    body: userData,
+                }),
+                refreshToken: () => api.request('/auth/refresh', { method: 'POST' }),
+            },
+
+            // Series endpoints
+            series: {
+                getAll: () => api.request('/series'),
+                getById: (id) => api.request(`/series/${id}`),
+            },
+
+            // Episode endpoints
+            episodes: {
+                getById: (id) => api.request(`/episodes/${id}`),
+                unlock: (id) => api.request(`/episodes/${id}/unlock`, { method: 'POST' }),
+            },
+
+            // User endpoints
+            user: {
+                getProfile: () => api.request('/user/profile'),
+                getCoins: () => api.request('/user/coins'),
+                getPurchases: () => api.request('/user/purchases'),
+            },
+
+            // Payment endpoints
+            payment: {
+                getBundles: (currency = 'INR') => api.request(`/payment/bundles?currency=${currency}`),
+                initiate: (bundleData) => api.request('/payment/initiate', {
+                    method: 'POST',
+                    body: bundleData,
+                }),
+            },
+        };
+
+        // Auth Provider Component
+        function AuthProvider({ children }) {
+            const [user, setUser] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [coins, setCoins] = useState(0);
+
+            useEffect(() => {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    loadUser();
+                } else {
+                    setLoading(false);
+                }
+            }, []);
+
+            const loadUser = async () => {
+                try {
+                    const userData = await api.user.getProfile();
+                    setUser(userData);
+                    const coinsData = await api.user.getCoins();
+                    setCoins(coinsData.balance);
+                } catch (error) {
+                    console.error('Failed to load user:', error);
+                    localStorage.removeItem('token');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const login = async (credentials) => {
+                const response = await api.auth.login(credentials);
+                localStorage.setItem('token', response.token);
+                setUser(response.user);
+                setCoins(response.user.coin_balance);
+                return response;
+            };
+
+            const register = async (userData) => {
+                const response = await api.auth.register(userData);
+                localStorage.setItem('token', response.token);
+                setUser(response.user);
+                setCoins(response.user.coin_balance);
+                return response;
+            };
+
+            const logout = () => {
+                localStorage.removeItem('token');
+                setUser(null);
+                setCoins(0);
+            };
+
+            const updateCoins = (newBalance) => {
+                setCoins(newBalance);
+            };
+
+            const value = {
+                user,
+                coins,
+                loading,
+                login,
+                register,
+                logout,
+                updateCoins,
+                isAuthenticated: !!user,
+            };
+
+            return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+        }
+
+        // Router Component
+        function Router() {
+            const [currentPage, setCurrentPage] = useState('home');
+            const [params, setParams] = useState({});
+
+            const navigate = (page, pageParams = {}) => {
+                setCurrentPage(page);
+                setParams(pageParams);
+            };
+
+            const renderPage = () => {
+                switch (currentPage) {
+                    case 'home':
+                        return <HomePage navigate={navigate} />;
+                    case 'login':
+                        return <LoginPage navigate={navigate} />;
+                    case 'register':
+                        return <RegisterPage navigate={navigate} />;
+                    case 'series':
+                        return <SeriesPage navigate={navigate} />;
+                    case 'series-detail':
+                        return <SeriesDetailPage navigate={navigate} seriesId={params.id} />;
+                    case 'episode':
+                        return <EpisodePage navigate={navigate} episodeId={params.id} />;
+                    case 'profile':
+                        return <ProfilePage navigate={navigate} />;
+                    case 'coins':
+                        return <CoinsPage navigate={navigate} />;
+                    default:
+                        return <HomePage navigate={navigate} />;
+                }
+            };
+
+            return (
+                <div className="app">
+                    <Header navigate={navigate} currentPage={currentPage} />
+                    <main className="main fade-in">
+                        {renderPage()}
+                    </main>
+                </div>
+            );
+        }
+
+        // Header Component
+        function Header({ navigate, currentPage }) {
+            const { user, coins, logout, isAuthenticated } = useAuth();
+
+            return (
+                <header className="header">
+                    <nav className="nav">
+                        <div className="logo" onClick={() => navigate('home')}>
+                            <i className="fas fa-headphones"></i> AudioSeries
+                        </div>
+                        
+                        <ul className="nav-links">
+                            <li>
+                                <a href="#" onClick={() => navigate('home')} 
+                                   className={currentPage === 'home' ? 'active' : ''}>
+                                    Home
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" onClick={() => navigate('series')}
+                                   className={currentPage === 'series' ? 'active' : ''}>
+                                    Series
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div className="user-menu">
+                            {isAuthenticated ? (
+                                <>
+                                    <div className="coin-display" onClick={() => navigate('coins')}>
+                                        <i className="fas fa-coins"></i>
+                                        {coins}
+                                    </div>
+                                    <button className="btn btn-secondary" onClick={() => navigate('profile')}>
+                                        <i className="fas fa-user"></i>
+                                        {user?.first_name}
+                                    </button>
+                                    <button className="btn btn-danger" onClick={logout}>
+                                        <i className="fas fa-sign-out-alt"></i>
+                                        Logout
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <button className="btn btn-secondary" onClick={() => navigate('login')}>
+                                        Login
+                                    </button>
+                                    <button className="btn btn-primary" onClick={() => navigate('register')}>
+                                        Sign Up
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </nav>
+                </header>
+            );
+        }
+
+        // HomePage Component
+        function HomePage({ navigate }) {
+            const { isAuthenticated } = useAuth();
+
+            return (
+                <div className="fade-in">
+                    <section className="hero">
+                        <h1>Premium Audio Stories</h1>
+                        <p>Immerse yourself in captivating audio series crafted by talented storytellers</p>
+                        <div className="hero-buttons">
+                            {isAuthenticated ? (
+                                <button className="btn btn-primary" onClick={() => navigate('series')}>
+                                    <i className="fas fa-play"></i>
+                                    Explore Series
+                                </button>
+                            ) : (
+                                <>
+                                    <button className="btn btn-primary" onClick={() => navigate('register')}>
+                                        <i className="fas fa-user-plus"></i>
+                                        Get Started
+                                    </button>
+                                    <button className="btn btn-secondary" onClick={() => navigate('login')}>
+                                        <i className="fas fa-sign-in-alt"></i>
+                                        Sign In
+                                    </button>
+                                </>
+                            )}
+                        </div>
+                    </section>
+
+                    <section style={{ color: 'white', textAlign: 'center', marginTop: '4rem' }}>
+                        <h2 style={{ marginBottom: '2rem', fontSize: '2.5rem' }}>Why Choose AudioSeries?</h2>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginTop: '3rem' }}>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)' }}>
+                                <i className="fas fa-star" style={{ fontSize: '3rem', marginBottom: '1rem' }}></i>
+                                <h3>Premium Quality</h3>
+                                <p>High-quality audio production with immersive soundscapes</p>
+                            </div>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)' }}>
+                                <i className="fas fa-coins" style={{ fontSize: '3rem', marginBottom: '1rem' }}></i>
+                                <h3>Flexible Pricing</h3>
+                                <p>Pay-per-episode with our coin system - only pay for what you listen to</p>
+                            </div>
+                            <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '2rem', borderRadius: '16px', backdropFilter: 'blur(10px)' }}>
+                                <i className="fas fa-mobile-alt" style={{ fontSize: '3rem', marginBottom: '1rem' }}></i>
+                                <h3>Listen Anywhere</h3>
+                                <p>Stream on any device, anytime, anywhere with offline support</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            );
+        }
+
+        // LoginPage Component
+        function LoginPage({ navigate }) {
+            const { login } = useAuth();
+            const [formData, setFormData] = useState({ email: '', password: '' });
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                setError('');
+
+                try {
+                    await login(formData);
+                    navigate('series');
+                } catch (error) {
+                    setError(error.message || 'Login failed');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="form-container fade-in">
+                    <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: '#667eea' }}>
+                        <i className="fas fa-sign-in-alt"></i> Welcome Back
+                    </h2>
+                    
+                    {error && (
+                        <div style={{ background: '#fee', color: '#c53030', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                            {error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="form-group">
+                            <label>Email</label>
+                            <input
+                                type="email"
+                                className="form-control"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                required
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Password</label>
+                            <input
+                                type="password"
+                                className="form-control"
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                required
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '1rem' }} disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <div className="spinner"></div>
+                                    Signing In...
+                                </>
+                            ) : (
+                                <>
+                                    <i className="fas fa-sign-in-alt"></i>
+                                    Sign In
+                                </>
+                            )}
+                        </button>
+
+                        <p style={{ textAlign: 'center' }}>
+                            Don't have an account?{' '}
+                            <a href="#" onClick={() => navigate('register')} style={{ color: '#667eea', textDecoration: 'none' }}>
+                                Sign up here
+                            </a>
+                        </p>
+                    </form>
+                </div>
+            );
+        }
+
+        // RegisterPage Component
+        function RegisterPage({ navigate }) {
+            const { register } = useAuth();
+            const [formData, setFormData] = useState({
+                email: '',
+                password: '',
+                first_name: '',
+                last_name: '',
+                phone: ''
+            });
+            const [loading, setLoading] = useState(false);
+            const [error, setError] = useState('');
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                setError('');
+
+                try {
+                    await register(formData);
+                    navigate('series');
+                } catch (error) {
+                    setError(error.message || 'Registration failed');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="form-container fade-in">
+                    <h2 style={{ textAlign: 'center', marginBottom: '2rem', color: '#667eea' }}>
+                        <i className="fas fa-user-plus"></i> Create Account
+                    </h2>
+
+                    {error && (
+                        <div style={{ background: '#fee', color: '#c53030', padding: '1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                            {error}
+                        </div>
+                    )}
+
+                    <form onSubmit={handleSubmit}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="form-group">
+                                <label>First Name</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={formData.first_name}
+                                    onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                                    required
+                                    disabled={loading}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Last Name</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={formData.last_name}
+                                    onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                                    required
+                                    disabled={loading}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Email</label>
+                            <input
+                                type="email"
+                                className="form-control"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                required
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Phone (Optional)</label>
+                            <input
+                                type="tel"
+                                className="form-control"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Password</label>
+                            <input
+                                type="password"
+                                className="form-control"
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                required
+                                minLength="6"
+                                disabled={loading}
+                            />
+                        </div>
+
+                        <button type="submit" className="btn btn-primary" style={{ width: '100%', marginBottom: '1rem' }} disabled={loading}>
+                            {loading ? (
+                                <>
+                                    <div className="spinner"></div>
+                                    Creating Account...
+                                </>
+                            ) : (
+                                <>
+                                    <i className="fas fa-user-plus"></i>
+                                    Create Account
+                                </>
+                            )}
+                        </button>
+
+                        <p style={{ textAlign: 'center' }}>
+                            Already have an account?{' '}
+                            <a href="#" onClick={() => navigate('login')} style={{ color: '#667eea', textDecoration: 'none' }}>
+                                Sign in here
+                            </a>
+                        </p>
+                    </form>
+                </div>
+            );
+        }
+
+        // SeriesPage Component
+        function SeriesPage({ navigate }) {
+            const [series, setSeries] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                loadSeries();
+            }, []);
+
+            const loadSeries = async () => {
+                try {
+                    const data = await api.series.getAll();
+                    setSeries(data || []);
+                } catch (error) {
+                    console.error('Failed to load series:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            if (loading) {
+                return (
+                    <div className="loading">
+                        <div className="spinner"></div>
+                        Loading series...
+                    </div>
+                );
+            }
+
+            return (
+                <div className="fade-in">
+                    <div style={{ textAlign: 'center', color: 'white', marginBottom: '2rem' }}>
+                        <h1><i className="fas fa-list"></i> Audio Series</h1>
+                        <p>Discover amazing audio stories and immersive experiences</p>
+                    </div>
+
+                    <div className="series-grid">
+                        {series.map((show) => (
+                            <div key={show.id} className="series-card slide-in" onClick={() => navigate('series-detail', { id: show.id })}>
+                                <div className="series-image">
+                                    <i className="fas fa-podcast"></i>
+                                </div>
+                                <div className="series-content">
+                                    <h3 className="series-title">{show.title}</h3>
+                                    <p style={{ color: '#666', marginBottom: '1rem' }}>{show.description}</p>
+                                    <div className="series-meta">
+                                        <span><i className="fas fa-user"></i> {show.author}</span>
+                                        {show.is_premium && <span className="premium-badge">Premium</span>}
+                                    </div>
+                                    <div className="series-meta" style={{ marginTop: '0.5rem' }}>
+                                        <span><i className="fas fa-list"></i> {show.total_episodes} episodes</span>
+                                        <span><i className="fas fa-tag"></i> {show.category}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {series.length === 0 && (
+                        <div style={{ textAlign: 'center', color: 'white', marginTop: '4rem' }}>
+                            <i className="fas fa-search" style={{ fontSize: '3rem', marginBottom: '1rem' }}></i>
+                            <h3>No series found</h3>
+                            <p>Check back later for new content!</p>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        // SeriesDetailPage Component
+        function SeriesDetailPage({ navigate, seriesId }) {
+            const [seriesData, setSeriesData] = useState(null);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                loadSeriesDetail();
+            }, [seriesId]);
+
+            const loadSeriesDetail = async () => {
+                try {
+                    const data = await api.series.getById(seriesId);
+                    setSeriesData(data);
+                } catch (error) {
+                    console.error('Failed to load series detail:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            if (loading) {
+                return (
+                    <div className="loading">
+                        <div className="spinner"></div>
+                        Loading series...
+                    </div>
+                );
+            }
+
+            if (!seriesData) {
+                return (
+                    <div style={{ textAlign: 'center', color: 'white', marginTop: '4rem' }}>
+                        <h2>Series not found</h2>
+                        <button className="btn btn-primary" onClick={() => navigate('series')}>
+                            Back to Series
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="fade-in">
+                    <button className="btn btn-secondary" onClick={() => navigate('series')} style={{ marginBottom: '2rem' }}>
+                        <i className="fas fa-arrow-left"></i> Back to Series
+                    </button>
+
+                    <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', marginBottom: '2rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '300px 1fr', gap: '2rem', alignItems: 'start' }}>
+                            <div className="series-image" style={{ height: '300px' }}>
+                                <i className="fas fa-podcast"></i>
+                            </div>
+                            <div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                                    <h1>{seriesData.series.title}</h1>
+                                    {seriesData.series.is_premium && <span className="premium-badge">Premium</span>}
+                                </div>
+                                <p style={{ fontSize: '1.1rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+                                    {seriesData.series.description}
+                                </p>
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+                                    <div>
+                                        <strong><i className="fas fa-user"></i> Author:</strong> {seriesData.series.author}
+                                    </div>
+                                    <div>
+                                        <strong><i className="fas fa-tag"></i> Category:</strong> {seriesData.series.category}
+                                    </div>
+                                    <div>
+                                        <strong><i className="fas fa-list"></i> Episodes:</strong> {seriesData.series.total_episodes}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style={{ color: 'white', marginBottom: '1rem' }}>
+                        <h2><i className="fas fa-play-circle"></i> Episodes</h2>
+                    </div>
+
+                    <div className="episode-list">
+                        {seriesData.episodes.map((episode) => (
+                            <EpisodeItem key={episode.id} episode={episode} navigate={navigate} />
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        // EpisodeItem Component
+        function EpisodeItem({ episode, navigate }) {
+            const { coins, updateCoins } = useAuth();
+            const [unlocking, setUnlocking] = useState(false);
+
+            const handleUnlock = async (e) => {
+                e.stopPropagation();
+                if (coins < episode.coin_price) {
+                    alert('Not enough coins! Purchase more coins to unlock this episode.');
+                    navigate('coins');
+                    return;
+                }
+
+                setUnlocking(true);
+                try {
+                    await api.episodes.unlock(episode.id);
+                    updateCoins(coins - episode.coin_price);
+                    // Refresh the page or update episode status
+                } catch (error) {
+                    alert('Failed to unlock episode: ' + error.message);
+                } finally {
+                    setUnlocking(false);
+                }
+            };
+
+            const formatDuration = (seconds) => {
+                const mins = Math.floor(seconds / 60);
+                return `${mins}min`;
+            };
+
+            return (
+                <div className="episode-item" onClick={() => navigate('episode', { id: episode.id })}>
+                    <div className="episode-info">
+                        <div className="episode-title">
+                            <i className="fas fa-play-circle" style={{ marginRight: '0.5rem', color: '#667eea' }}></i>
+                            Episode {episode.episode_number}: {episode.title}
+                        </div>
+                        <div className="episode-duration">
+                            <i className="fas fa-clock"></i> {formatDuration(episode.duration)}
+                        </div>
+                        <p style={{ color: '#666', marginTop: '0.5rem' }}>{episode.description}</p>
+                    </div>
+                    <div className="episode-actions">
+                        {episode.is_locked ? (
+                            <>
+                                <div className="coin-price">
+                                    <i className="fas fa-coins"></i>
+                                    {episode.coin_price}
+                                </div>
+                                <button 
+                                    className="btn btn-primary" 
+                                    onClick={handleUnlock}
+                                    disabled={unlocking || coins < episode.coin_price}
+                                >
+                                    {unlocking ? (
+                                        <>
+                                            <div className="spinner" style={{ width: '16px', height: '16px' }}></div>
+                                            Unlocking...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <i className="fas fa-unlock"></i>
+                                            Unlock
+                                        </>
+                                    )}
+                                </button>
+                            </>
+                        ) : (
+                            <button className="btn btn-success">
+                                <i className="fas fa-play"></i>
+                                Play
+                            </button>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // EpisodePage Component
+        function EpisodePage({ navigate, episodeId }) {
+            const [episode, setEpisode] = useState(null);
+            const [loading, setLoading] = useState(true);
+            const [playing, setPlaying] = useState(false);
+            const [progress, setProgress] = useState(0);
+
+            useEffect(() => {
+                loadEpisode();
+            }, [episodeId]);
+
+            const loadEpisode = async () => {
+                try {
+                    const data = await api.episodes.getById(episodeId);
+                    setEpisode(data);
+                } catch (error) {
+                    console.error('Failed to load episode:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const togglePlay = () => {
+                setPlaying(!playing);
+                // In a real app, you'd control actual audio playback here
+            };
+
+            if (loading) {
+                return (
+                    <div className="loading">
+                        <div className="spinner"></div>
+                        Loading episode...
+                    </div>
+                );
+            }
+
+            if (!episode) {
+                return (
+                    <div style={{ textAlign: 'center', color: 'white', marginTop: '4rem' }}>
+                        <h2>Episode not found</h2>
+                        <button className="btn btn-primary" onClick={() => navigate('series')}>
+                            Back to Series
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="fade-in">
+                    <button className="btn btn-secondary" onClick={() => navigate('series')} style={{ marginBottom: '2rem' }}>
+                        <i className="fas fa-arrow-left"></i> Back
+                    </button>
+
+                    <div className="audio-player">
+                        <h2 style={{ marginBottom: '1rem' }}>{episode.episode.title}</h2>
+                        <p style={{ color: '#666', marginBottom: '2rem' }}>{episode.episode.description}</p>
+
+                        {episode.is_owned ? (
+                            <div className="player-controls">
+                                <button className="play-btn" onClick={togglePlay}>
+                                    <i className={`fas fa-${playing ? 'pause' : 'play'}`}></i>
+                                </button>
+                                <div className="progress-bar">
+                                    <div className="progress-fill" style={{ width: `${progress}%` }}></div>
+                                </div>
+                                <span style={{ fontSize: '0.9rem', color: '#666' }}>
+                                    {Math.floor(episode.episode.duration / 60)}:00
+                                </span>
+                            </div>
+                        ) : (
+                            <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                <i className="fas fa-lock" style={{ fontSize: '3rem', marginBottom: '1rem', color: '#ccc' }}></i>
+                                <h3>Episode Locked</h3>
+                                <p style={{ marginBottom: '2rem' }}>Unlock this episode to start listening</p>
+                                <div className="coin-price" style={{ display: 'inline-flex', marginBottom: '1rem' }}>
+                                    <i className="fas fa-coins"></i>
+                                    {episode.episode.coin_price} coins
+                                </div>
+                                <br />
+                                {episode.can_unlock ? (
+                                    <button className="btn btn-primary">
+                                        <i className="fas fa-unlock"></i>
+                                        Unlock Episode
+                                    </button>
+                                ) : (
+                                    <button className="btn btn-secondary" onClick={() => navigate('coins')}>
+                                        <i className="fas fa-coins"></i>
+                                        Buy More Coins
+                                    </button>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // ProfilePage Component
+        function ProfilePage({ navigate }) {
+            const { user } = useAuth();
+            const [purchases, setPurchases] = useState([]);
+            const [loading, setLoading] = useState(true);
+
+            useEffect(() => {
+                loadPurchases();
+            }, []);
+
+            const loadPurchases = async () => {
+                try {
+                    const data = await api.user.getPurchases();
+                    setPurchases(data || []);
+                } catch (error) {
+                    console.error('Failed to load purchases:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="fade-in">
+                    <div style={{ color: 'white', marginBottom: '2rem' }}>
+                        <h1><i className="fas fa-user"></i> Profile</h1>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+                        <div style={{ background: 'white', borderRadius: '16px', padding: '2rem' }}>
+                            <h2 style={{ marginBottom: '1.5rem', color: '#667eea' }}>
+                                <i className="fas fa-user-circle"></i> Personal Information
+                            </h2>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>Name:</strong> {user?.first_name} {user?.last_name}
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>Email:</strong> {user?.email}
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>Phone:</strong> {user?.phone || 'Not provided'}
+                            </div>
+                            <div>
+                                <strong>Member since:</strong> {user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                            </div>
+                        </div>
+
+                        <div style={{ background: 'white', borderRadius: '16px', padding: '2rem' }}>
+                            <h2 style={{ marginBottom: '1.5rem', color: '#667eea' }}>
+                                <i className="fas fa-chart-line"></i> Account Stats
+                            </h2>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>Episodes Purchased:</strong> {purchases.filter(p => p.type === 'episode').length}
+                            </div>
+                            <div style={{ marginBottom: '1rem' }}>
+                                <strong>Total Spent:</strong> {purchases.reduce((total, p) => total + p.amount, 0)} coins
+                            </div>
+                            <button className="btn btn-primary" onClick={() => navigate('coins')}>
+                                <i className="fas fa-coins"></i>
+                                Manage Coins
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style={{ background: 'white', borderRadius: '16px', padding: '2rem' }}>
+                        <h2 style={{ marginBottom: '1.5rem', color: '#667eea' }}>
+                            <i className="fas fa-history"></i> Purchase History
+                        </h2>
+                        
+                        {loading ? (
+                            <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                <div className="spinner" style={{ borderColor: '#667eea', borderTopColor: 'transparent' }}></div>
+                                Loading purchases...
+                            </div>
+                        ) : purchases.length > 0 ? (
+                            <div>
+                                {purchases.map((purchase) => (
+                                    <div key={purchase.id} style={{ 
+                                        borderBottom: '1px solid #eee', 
+                                        paddingBottom: '1rem', 
+                                        marginBottom: '1rem',
+                                        display: 'flex',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center'
+                                    }}>
+                                        <div>
+                                            <div style={{ fontWeight: 'bold' }}>{purchase.type} Purchase</div>
+                                            <div style={{ color: '#666', fontSize: '0.9rem' }}>
+                                                {new Date(purchase.created_at).toLocaleDateString()}
+                                            </div>
+                                        </div>
+                                        <div style={{ textAlign: 'right' }}>
+                                            <div style={{ fontWeight: 'bold', color: '#667eea' }}>
+                                                {purchase.amount} coins
+                                            </div>
+                                            <div style={{ color: '#666', fontSize: '0.9rem' }}>
+                                                {purchase.status}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                                <i className="fas fa-shopping-cart" style={{ fontSize: '3rem', marginBottom: '1rem' }}></i>
+                                <p>No purchases yet</p>
+                                <button className="btn btn-primary" onClick={() => navigate('series')}>
+                                    <i className="fas fa-play"></i>
+                                    Start Listening
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // CoinsPage Component
+        function CoinsPage({ navigate }) {
+            const { coins } = useAuth();
+            const [bundles, setBundles] = useState([]);
+            const [loading, setLoading] = useState(true);
+            const [currency, setCurrency] = useState('INR');
+
+            useEffect(() => {
+                loadBundles();
+            }, [currency]);
+
+            const loadBundles = async () => {
+                try {
+                    const data = await api.payment.getBundles(currency);
+                    setBundles(data || []);
+                } catch (error) {
+                    console.error('Failed to load bundles:', error);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handlePurchase = async (bundleId) => {
+                try {
+                    const response = await api.payment.initiate({
+                        bundle_id: bundleId,
+                        currency: currency
+                    });
+                    
+                    // In a real app, you'd redirect to the payment gateway
+                    alert('Payment initiated! In a real app, you would be redirected to the payment gateway.');
+                    console.log('Payment response:', response);
+                } catch (error) {
+                    alert('Failed to initiate payment: ' + error.message);
+                }
+            };
+
+            const formatPrice = (price, curr) => {
+                const symbol = curr === 'INR' ? '₹' : '₦';
+                return `${symbol}${(price / 100).toFixed(0)}`;
+            };
+
+            return (
+                <div className="fade-in">
+                    <div style={{ color: 'white', marginBottom: '2rem', textAlign: 'center' }}>
+                        <h1><i className="fas fa-coins"></i> Purchase Coins</h1>
+                        <p>Your current balance: <strong>{coins} coins</strong></p>
+                    </div>
+
+                    <div style={{ background: 'white', borderRadius: '16px', padding: '2rem', marginBottom: '2rem', textAlign: 'center' }}>
+                        <h3 style={{ marginBottom: '1rem', color: '#667eea' }}>Select Currency</h3>
+                        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                            <button 
+                                className={`btn ${currency === 'INR' ? 'btn-primary' : 'btn-secondary'}`}
+                                onClick={() => setCurrency('INR')}
+                            >
+                                🇮🇳 Indian Rupee (INR)
+                            </button>
+                            <button 
+                                className={`btn ${currency === 'NGN' ? 'btn-primary' : 'btn-secondary'}`}
+                                onClick={() => setCurrency('NGN')}
+                            >
+                                🇳🇬 Nigerian Naira (NGN)
+                            </button>
+                        </div>
+                    </div>
+
+                    {loading ? (
+                        <div className="loading">
+                            <div className="spinner"></div>
+                            Loading coin bundles...
+                        </div>
+                    ) : (
+                        <div className="bundles-grid">
+                            {bundles.map((bundle) => (
+                                <div key={bundle.id} className="bundle-card">
+                                    <div className="bundle-coins">
+                                        <i className="fas fa-coins"></i> {bundle.coins}
+                                    </div>
+                                    <div style={{ fontSize: '1rem', color: '#666', marginBottom: '1rem' }}>
+                                        {bundle.name}
+                                    </div>
+                                    <div className="bundle-price">
+                                        {formatPrice(bundle.price, bundle.currency)}
+                                    </div>
+                                    <button 
+                                        className="btn btn-primary" 
+                                        style={{ width: '100%' }}
+                                        onClick={() => handlePurchase(bundle.id)}
+                                    >
+                                        <i className="fas fa-shopping-cart"></i>
+                                        Purchase
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    <div style={{ marginTop: '3rem', textAlign: 'center' }}>
+                        <button className="btn btn-secondary" onClick={() => navigate('series')}>
+                            <i className="fas fa-arrow-left"></i>
+                            Back to Series
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        // Main App Component
+        function App() {
+            return (
+                <AuthProvider>
+                    <Router />
+                </AuthProvider>
+            );
+        }
+
+        // Render the app
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
