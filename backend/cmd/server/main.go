@@ -5,10 +5,7 @@ import (
 	"os"
 
 	"audio-series-app/backend/internal/config"
-	"audio-series-app/backend/internal/handlers"
 	"audio-series-app/backend/internal/middleware"
-	"audio-series-app/backend/internal/routes"
-	"audio-series-app/backend/internal/services"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -28,25 +25,7 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	// Initialize services
-	supabaseService := services.NewSupabaseService(cfg)
-	authService := services.NewAuthService(cfg, supabaseService)
-	userService := services.NewUserService(supabaseService)
-	seriesService := services.NewSeriesService(supabaseService)
-	episodeService := services.NewEpisodeService(supabaseService)
-	paymentService := services.NewPaymentService(cfg, supabaseService)
-	coinService := services.NewCoinService(supabaseService)
-
-	// Initialize handlers
-	authHandler := handlers.NewAuthHandler(authService)
-	userHandler := handlers.NewUserHandler(userService)
-	seriesHandler := handlers.NewSeriesHandler(seriesService)
-	episodeHandler := handlers.NewEpisodeHandler(episodeService, coinService)
-	paymentHandler := handlers.NewPaymentHandler(paymentService, coinService)
-	adminHandler := handlers.NewAdminHandler(seriesService, episodeService, userService)
-
 	// Initialize middleware
-	authMiddleware := middleware.NewAuthMiddleware(authService)
 	corsMiddleware := middleware.NewCorsMiddleware(cfg)
 
 	// Create router
@@ -55,17 +34,23 @@ func main() {
 	// Apply middleware
 	router.Use(corsMiddleware.Handle())
 
-	// Setup routes
-	routes.SetupRoutes(
-		router,
-		authHandler,
-		userHandler,
-		seriesHandler,
-		episodeHandler,
-		paymentHandler,
-		adminHandler,
-		authMiddleware,
-	)
+	// Serve static files (frontend)
+	router.Static("/static", "./frontend")
+	router.LoadHTMLGlob("frontend/*.html")
+
+	// Serve the main frontend page
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(200, "audio_series_frontend.html", nil)
+	})
+
+	// Health check endpoint
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status":       "ok",
+			"message":      "Audio Series App is running",
+			"supabase_url": cfg.SupabaseURL,
+		})
+	})
 
 	// Start server
 	port := os.Getenv("PORT")
@@ -75,6 +60,7 @@ func main() {
 
 	log.Printf("🚀 Server starting on port %s", port)
 	log.Printf("📊 Environment: %s", cfg.Environment)
+	log.Printf("🔗 Supabase URL: %s", cfg.SupabaseURL)
 
 	if err := router.Run(":" + port); err != nil {
 		log.Fatal("Failed to start server:", err)

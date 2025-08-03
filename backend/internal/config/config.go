@@ -1,8 +1,10 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -57,6 +59,50 @@ func Load() *Config {
 	}
 }
 
+// IsDirectDatabaseURL checks if the Supabase URL is a direct database connection
+func (c *Config) IsDirectDatabaseURL() bool {
+	return strings.HasPrefix(c.SupabaseURL, "postgresql://")
+}
+
+// GetDatabaseURL returns the database connection URL
+func (c *Config) GetDatabaseURL() string {
+	// First, check if DATABASE_URL is set (direct connection)
+	if dbURL := getEnv("DATABASE_URL", ""); dbURL != "" {
+		return dbURL
+	}
+
+	if c.IsDirectDatabaseURL() {
+		return c.SupabaseURL
+	}
+
+	// Convert REST API URL to direct database URL
+	// Extract project reference from https://your-project.supabase.co
+	if strings.HasPrefix(c.SupabaseURL, "https://") {
+		parts := strings.Split(c.SupabaseURL, "//")
+		if len(parts) == 2 {
+			projectRef := strings.Split(parts[1], ".")[0]
+			// You'll need to get the database password from environment or config
+			dbPassword := getEnv("SUPABASE_DB_PASSWORD", "")
+			if dbPassword != "" {
+				return fmt.Sprintf("postgresql://postgres:%s@db.%s.supabase.co:5432/postgres", dbPassword, projectRef)
+			}
+		}
+	}
+
+	return ""
+}
+
+// GetSupabaseProjectRef extracts the project reference from the URL
+func (c *Config) GetSupabaseProjectRef() string {
+	if strings.HasPrefix(c.SupabaseURL, "https://") {
+		parts := strings.Split(c.SupabaseURL, "//")
+		if len(parts) == 2 {
+			return strings.Split(parts[1], ".")[0]
+		}
+	}
+	return ""
+}
+
 func getEnv(key, defaultValue string) string {
 	if value := os.Getenv(key); value != "" {
 		return value
@@ -75,9 +121,7 @@ func getEnvAsInt(key string, defaultValue int) int {
 
 func getEnvAsSlice(key string, defaultValue []string) []string {
 	if value := os.Getenv(key); value != "" {
-		// Simple comma-separated values parsing
-		// In production, you might want more sophisticated parsing
-		return []string{value}
+		return strings.Split(value, ",")
 	}
 	return defaultValue
 }

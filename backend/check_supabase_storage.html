@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Storage Checker</title>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Supabase Storage Checker</h1>
+        
+        <button onclick="checkBuckets()">Check All Buckets</button>
+        <button onclick="checkAudioBucket()">Check Audio Bucket Files</button>
+        <button onclick="testFileAccess()">Test File Access</button>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Supabase Configuration
+        const SUPABASE_URL = 'https://mhbcihpkcetbzdrzciqe.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_LwZ8NiJyAc-nV4PRV1b1UA_tc1lPhsO';
+
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        function addResult(title, content, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result ${type}`;
+            resultDiv.innerHTML = `
+                <h3>${title}</h3>
+                <pre>${JSON.stringify(content, null, 2)}</pre>
+            `;
+            resultsDiv.appendChild(resultDiv);
+        }
+
+        async function checkBuckets() {
+            try {
+                addResult('🔍 Checking all buckets...', 'Loading...');
+                
+                const { data, error } = await supabase.storage.listBuckets();
+                
+                if (error) {
+                    addResult('❌ Error listing buckets', error, 'error');
+                    return;
+                }
+
+                addResult('✅ Found buckets', data, 'success');
+                
+                // Check each bucket
+                for (const bucket of data) {
+                    await checkBucketFiles(bucket.name);
+                }
+                
+            } catch (error) {
+                addResult('❌ Exception occurred', error, 'error');
+            }
+        }
+
+        async function checkBucketFiles(bucketName) {
+            try {
+                addResult(`🔍 Checking files in '${bucketName}' bucket...`, 'Loading...');
+                
+                const { data, error } = await supabase.storage
+                    .from(bucketName)
+                    .list('', {
+                        limit: 100,
+                        offset: 0
+                    });
+                
+                if (error) {
+                    addResult(`❌ Error listing files in ${bucketName}`, error, 'error');
+                    return;
+                }
+
+                if (data && data.length > 0) {
+                    addResult(`✅ Found ${data.length} files in ${bucketName}`, data, 'success');
+                    
+                    // Generate public URLs
+                    const urls = data.map(file => {
+                        const publicURL = supabase.storage
+                            .from(bucketName)
+                            .getPublicUrl(file.name);
+                        return {
+                            filename: file.name,
+                            size: file.metadata?.size,
+                            url: publicURL.data.publicUrl
+                        };
+                    });
+                    
+                    addResult(`🔗 Public URLs for ${bucketName}`, urls, 'success');
+                } else {
+                    addResult(`⚠️ No files found in ${bucketName}`, [], 'info');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Exception checking ${bucketName}`, error, 'error');
+            }
+        }
+
+        async function checkAudioBucket() {
+            await checkBucketFiles('audio');
+        }
+
+        async function testFileAccess() {
+            try {
+                addResult('🔍 Testing file access...', 'Loading...');
+                
+                // Test some common filenames
+                const testFiles = [
+                    'sample.mp4',
+                    'video.mp4',
+                    'test.mp4',
+                    'audio.mp3',
+                    'sample.mp3'
+                ];
+                
+                const results = [];
+                
+                for (const filename of testFiles) {
+                    try {
+                        const { data, error } = supabase.storage
+                            .from('audio')
+                            .getPublicUrl(filename);
+                        
+                        if (error) {
+                            results.push({
+                                filename,
+                                status: 'error',
+                                error: error.message
+                            });
+                        } else {
+                            // Test if the URL is accessible
+                            const response = await fetch(data.publicUrl, { method: 'HEAD' });
+                            results.push({
+                                filename,
+                                status: response.ok ? 'found' : 'not_found',
+                                url: data.publicUrl,
+                                httpStatus: response.status
+                            });
+                        }
+                    } catch (error) {
+                        results.push({
+                            filename,
+                            status: 'error',
+                            error: error.message
+                        });
+                    }
+                }
+                
+                addResult('🔗 File access test results', results, 'info');
+                
+            } catch (error) {
+                addResult('❌ Exception testing file access', error, 'error');
+            }
+        }
+
+        // Auto-run on page load
+        window.onload = function() {
+            addResult('🚀 Supabase Storage Checker Ready', {
+                url: SUPABASE_URL,
+                message: 'Click buttons above to check your storage'
+            }, 'info');
+        };
+    </script>
+</body>
+</html> 
